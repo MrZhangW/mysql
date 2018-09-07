@@ -1,0 +1,28 @@
+SELECT
+((SUBSTRING_INDEX(SUBSTRING_INDEX(group_concat(pgc_amount order by pgc_amount), ',', floor(1+((count(pgc_amount)-1) / 2))), ',', -1))
++
+(SUBSTRING_INDEX(SUBSTRING_INDEX(group_concat(pgc_amount order by pgc_amount), ',', ceiling(1+((count(pgc_amount)-1) / 2))), ',', -1)))/2
+as median
+FROM test;
+
+
+-------------------------------------
+SET @rownum := -1;
+
+SELECT
+
+AVG(g.pgc_amount)
+
+FROM
+
+(SELECT @rownum:=@rownum + 1 AS rowindex,
+
+test.pgc_amount AS pgc_amount
+
+FROM test
+
+ORDER BY test.pgc_amount) AS g
+
+WHERE
+
+g.rowindex IN (FLOOR(@rownum / 2) , CEIL(@rownum / 2));
